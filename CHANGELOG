@@ -1,0 +1,9 @@
+v1.0.1
+	- rewrite from scratch for wolfcms 0.7.3
+	- add mime type for codemirror.php
+	- add highlighter option (text, css, javascript, html mixed-mode, html+php mixed-mode)
+	- add codemirror.css for easier editing of themes
+	- change license to UNLICENSE - http://unlicense.org
+	
+v1.0.0
+	- initial release
