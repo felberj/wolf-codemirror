@@ -7,10 +7,9 @@ var cmDir = "<?php echo $pluginDir; ?>";
 var cmEditor = {};
 
 var CodeMirrorConfig = {	
-	tabMode: 'spaces',
 	lineNumbers: true,	
 	textWrapping: false,
-	path: cmDir + "/js/"	
+	path: cmDir + "/js/"
 };
 
 var dummyParser = {
@@ -117,7 +116,12 @@ function setSwitcher(target,id){
 		'<option value="htmlphpmixedParser" selected="selected">HTML+PHP mixed-mode</option>'+				
 		'</select>';
 	
-	target.parent().append(el);
+	if (id === "file_content"){
+		target.parent().prepend(el);
+		$("label[for="+cmSwitch+"]").css({"margin-left":0});		
+	} else {
+		target.parent().append(el);
+	}
 		
 	$("#"+cmSwitch).change(function(){
 		var cmParser = defaultCfg;
@@ -145,32 +149,41 @@ function setSwitcher(target,id){
 	});
 }
 
-// @todo what should I do if other plugin set this function first ?
-// hope next wolfcms release will remove this function
-if(typeof window.setTextAreaToolbar !== 'function') {
-	function setTextAreaToolbar(el,filter){
-		resetCM(el);
-		if (filter === 'codemirror') {			
-			setCM(el);
-			setSwitcher($("#snippet_filter_id"),el);
-		}
+// backward
+function setTextAreaToolbar(el,filter){
+	resetCM(el);
+	if (filter === 'codemirror') {			
+		setCM(el);
+		setSwitcher($("#snippet_filter_id"),el);
 	}
 }
 
 $(function(){
-	if ($("#layout_content").length > 0) setCM("layout_content");
+	if ($("#layout_content").length > 0) setCM("layout_content");	
 
-    $('.filter-selector').bind('wolfSwitchFilterOut', function(event, filtername, elem) {
+    $('.filter-selector').live('wolfSwitchFilterOut', function(event, filtername, elem) {
         if (filtername == 'codemirror') {			
 			resetCM(elem.attr('id'));
 		}
     });
     
-    $('.filter-selector').bind('wolfSwitchFilterIn', function(event, filtername, elem) {
+    $('.filter-selector').live('wolfSwitchFilterIn', function(event, filtername, elem) {
         if (filtername == 'codemirror') {
 			var el = elem.attr('id');			
 			setCM(el);
 			setSwitcher($(this), el);
         }
-    });	
+    });    
+    
+    if ($("#file_content").length > 0){
+		var cm_url = $("#file_manager-plugin a").attr("href");
+		var cm_idx = cm_url.indexOf("file_manager");
+		var cm_url = cm_url.substr(0, cm_idx) + "codemirror/cm_integrate";
+		$.get(cm_url, function(data){
+			if (data === "1") {			
+				setCM("file_content");
+				setSwitcher($("#file_content"),'file_content'); 
+			}
+		});
+	}
 });

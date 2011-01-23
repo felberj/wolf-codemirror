@@ -1,3 +1,7 @@
+v1.0.2
+	- Change jquery bind to live
+	- Added setting page to integrate with File Manager plugin
+	
 v1.0.1
 	- rewrite from scratch for wolfcms 0.7.3
 	- add mime type for codemirror.php
