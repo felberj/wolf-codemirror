@@ -21,7 +21,10 @@ Plugin::setInfos(array(
 ));
 
 Filter::add('codemirror', 'codemirror/filter_codemirror.php');
-Plugin::addController('codemirror', 'Codemirror', 'administrator,developer', false);
+Plugin::addController('codemirror', 'codemirror', 'administrator,developer', false);
 Plugin::addJavascript('codemirror','codemirror.php');
-Plugin::addJavascript('codemirror', 'codemirror/js/codemirror.js');
-
+Plugin::addJavascript('codemirror', 'codemirror/lib/codemirror.js');
+Plugin::addJavascript('codemirror', 'codemirror/mode/xml/xml.js');
+Plugin::addJavascript('codemirror', 'codemirror/mode/javascript/javascript.js');
+Plugin::addJavascript('codemirror', 'codemirror/mode/css/css.js');
+Plugin::addJavascript('codemirror', 'codemirror/mode/htmlmixed/htmlmixed.js');
