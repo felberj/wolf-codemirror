@@ -13,24 +13,74 @@ function addCss(css){
 
 var cmEditor = {};
 
-function setCM(el){
+function setCM(el, modeParser){
 	if (typeof cmEditor[el] !== 'undefined') return false; 
+
+	var cmMode = 'htmlmixed';
+
+	if (modeParser != null) { cmMode = modeParser; }
 
 	cmEditor[el] = CodeMirror.fromTextArea(
 		document.getElementById(el), {
-			mode: 'text/html',
+			mode: cmMode,
 			lineNumbers: true
 		});
 };
 
-// doesn't work (yet)
-function resetCM(el){
+function resetCM(el,stay){
 	if (typeof cmEditor[el] !== 'undefined'){
-		//$("#"+el).html(cmEditor[el].getValue());
 		cmEditor[el].toTextArea();
 		delete cmEditor[el];
+		
+		// switcher
+		if (stay != null) return false;
+		var cmSwitch = "codemirror-" + el;
+		$("label[for="+cmSwitch+"]").remove();
+		$("#"+cmSwitch).remove();
 	}
 };
+
+function setSwitcher(target,id){
+	var cmSwitch = 'codemirror-' + id;
+
+	if ($("#"+cmSwitch).length > 0) return false;
+
+	var el = '<label for="'+cmSwitch+'" style="margin: 0 4px 0 50px;">Highlight</label>'+
+		'<select id="'+cmSwitch+'">'+
+		'<option value="javascript">Javascript</option>'+
+		'<option value="xml">XML/HTML</option>'+
+		'<option value="css">CSS</option>'+
+		'<option value="htmlmixed" selected="selected">Mixed-mode HTML</option>'+
+		'</select>';
+
+	if (id === "file_content"){
+		target.parent().prepend(el);
+		$("label[for="+cmSwitch+"]").css({"margin-left":0});
+	} else {
+		target.parent().append(el);
+	}
+
+	$("#"+cmSwitch).change(function(){
+		var cmParser = 'htmlmixed';
+		switch ($(this).val())
+		{
+			case "css":
+				cmParser = 'css';
+			break;
+
+			case "javascript":
+				cmParser = 'javascript';
+			break;
+
+			case "xml":
+				cmParser = 'xml';
+			break;
+		}
+
+		resetCM(id,true);
+		setCM(id,cmParser);
+	});
+}
 
 $(function(){
 
@@ -48,7 +98,10 @@ $(function(){
 	});
 
 	$('.filter-selector').live('wolfSwitchFilterIn', function(event, filtername, elem) {
-		if (filtername == 'codemirror') setCM(elem.attr('id'));
+		if (filtername == 'codemirror') {
+			setCM(elem.attr('id'));
+			setSwitcher($(this), elem.attr('id'));
+		}
 	});
 
 	if ($("#file_content").length > 0){
@@ -58,6 +111,7 @@ $(function(){
 		$.get(cm_url, function(data){
 			if (data === "1") {
 				setCM("file_content");
+				setSwitcher($("#file_content"),'file_content');
 			}
 		});
 	}

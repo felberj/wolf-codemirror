@@ -1,8 +1,6 @@
 February 14, 2011
 	- created branch codemirror2
 	- test CodeMirror2 - http://codemirror.net/2/
-	- resetCM doesn't work(yet) still buggy
-	- current support parser only htmlmixed
 
 v1.0.2
 	- Change jquery bind to live
