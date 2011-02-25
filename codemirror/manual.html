@@ -173,11 +173,6 @@
       indentation (only works if the mode supports indentation).
       Default is true.</dd>
 
-      <dt id="option_blockDocumentScroll"><code>blockDocumentScroll (boolean)</code></dt>
-      <dd>When true (the default) using the scroll wheel inside the
-      editor will only cause the editor to scroll, not the document
-      around it.</dd>
-
       <dt id="option_lineNumbers"><code>lineNumbers (boolean)</code></dt>
       <dd>Whether to show line numbers to the left of the editor.</dd>
 
@@ -369,6 +364,10 @@
       page. <code>yBot</code> is the coordinate of the bottom of the
       cursor. <code>start</code> is a boolean indicating whether you
       want the start or the end of the selection.</dd>
+      <dt id="charCoords"><code>charCoords(pos) → object</code></dt>
+      <dd>Like <code>cursorCoords</code>, but returns the position of
+      an arbitrary characters. <code>pos</code> should be
+      a <code>{line, ch}</code> object.</dd>
 
       <dt id="undo"><code>undo()</code></dt>
       <dd>Undo one edit (if any undo events are stored).</dd>
@@ -378,6 +377,10 @@
       <dd>Returns an object with <code>{undo, redo}</code> properties,
       both of which hold integers, indicating the amount of stored
       undo and redo operations.</dd>
+
+      <dt id="indentLine"><code>indentLine(line)</code></dt>
+      <dd>Reset the given line's indentation to the indentation
+      prescribed by the mode.</dd>
 
       <dt id="getSearchCursor"><code>getSearchCursor(query, start, caseFold) → cursor</code></dt>
       <dd>Used to implement search/replace
@@ -501,7 +504,7 @@
       <dt id="operation"><code>operation(func) → result</code></dt>
       <dd>CodeMirror internally buffers changes and only updates its
       DOM structure after it has finished performing some operation.
-      If you need to performing a lot of operations on a CodeMirror
+      If you need to perform a lot of operations on a CodeMirror
       instance, you can call this method with a function argument. It
       will call the function, buffering up all changes, and only doing
       the expensive update after the function returns. This can be a
@@ -600,6 +603,9 @@
       <dt><code>eol() → boolean</code></dt>
       <dd>Returns true only if the stream is at the end of the
       line.</dd>
+      <dt><code>sol() → boolean</code></dt>
+      <dd>Returns true only if the stream is at the start of the
+      line.</dd>
 
       <dt><code>peek() → character</code></dt>
       <dd>Returns the next character in the stream without advancing
@@ -616,12 +622,17 @@
       the next character in the stream 'matches' the given argument,
       it is consumed and returned. Otherwise, <code>undefined</code>
       is returned.</dd>
-      <dt><code>eatWhile(match) → integer</code></dt>
+      <dt><code>eatWhile(match) → boolean</code></dt>
       <dd>Repeatedly calls <code>eat</code> with the given argument,
-      until it fails. Returns the amount of eaten characters.</dd>
-      <dt><code>eatSpace() → integer</code></dt>
+      until it fails. Returns true if any characters were eaten.</dd>
+      <dt><code>eatSpace() → boolean</code></dt>
       <dd>Shortcut for <code>eatWhile</code> when matching
       white-space.</dd>
+      <dt><code>skipToEnd()</code></dt>
+      <dd>Moves the position to the end of the line.</dd>
+      <dt><code>skipTo(ch) → boolean</code></dt>
+      <dd>Skips to the next occurrence of the given character, if
+      found. Returns true if the character was found.</dd>
       <dt><code>match(pattern, consume, caseFold) → boolean</code></dt>
       <dd>Act like a
       multi-character <code>eat</code>—if <code>consume</code> is true
@@ -639,9 +650,9 @@
       further than the start of the current token will cause things to
       break, so be careful.</dd>
       <dt><code>column() → integer</code></dt>
-      <dd>Returns the character position (in the current line) at
-      which the stream currently sits. Can be used to find out whether
-      a token starts a new line.</dd>
+      <dd>Returns the column (taking into account tabs) at which the
+      current token starts. Can be used to find out whether a token
+      starts a new line.</dd>
       <dt><code>indentation() → integer</code></dt>
       <dd>Tells you how far the current line has been indented, in
       spaces. Corrects for tab characters.</dd>
