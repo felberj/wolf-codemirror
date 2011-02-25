@@ -16,7 +16,7 @@ var cmEditor = {};
 function setCM(el, modeParser){
 	if (typeof cmEditor[el] !== 'undefined') return false; 
 
-	var cmMode = 'htmlmixed';
+	var cmMode = 'php';
 
 	if (modeParser != null) { cmMode = modeParser; }
 
@@ -47,10 +47,12 @@ function setSwitcher(target,id){
 
 	var el = '<label for="'+cmSwitch+'" style="margin: 0 4px 0 50px;">Highlight</label>'+
 		'<select id="'+cmSwitch+'">'+
+		'<option value="null">&#8212; none &#8212;</option>'+
 		'<option value="javascript">Javascript</option>'+
 		'<option value="xml">XML/HTML</option>'+
 		'<option value="css">CSS</option>'+
-		'<option value="htmlmixed" selected="selected">Mixed-mode HTML</option>'+
+		'<option value="htmlmixed">Mixed-mode HTML</option>'+
+		'<option value="php" selected="selected">PHP</option>'+
 		'</select>';
 
 	if (id === "file_content"){
@@ -61,7 +63,7 @@ function setSwitcher(target,id){
 	}
 
 	$("#"+cmSwitch).change(function(){
-		var cmParser = 'htmlmixed';
+		var cmParser = 'php';
 		switch ($(this).val())
 		{
 			case "css":
@@ -75,6 +77,14 @@ function setSwitcher(target,id){
 			case "xml":
 				cmParser = 'xml';
 			break;
+			
+			case "htmlmixed":
+				cmParser = 'htmlmixed';
+			break;
+			
+			case "null":
+				cmParser = 'null';
+			break;
 		}
 
 		resetCM(id,true);
@@ -84,7 +94,13 @@ function setSwitcher(target,id){
 
 $(function(){
 
-	var css = ['lib/codemirror.css','mode/xml/xml.css','mode/javascript/javascript.css','mode/css/css.css'];
+	var css = [
+		'lib/codemirror.css',
+		'mode/xml/xml.css',
+		'mode/javascript/javascript.css',
+		'mode/css/css.css',
+		'mode/clike/clike.css'
+	];
 
 	for ( var i = 0; i < css.length; i++ )
 		addCss('<?php echo $pluginDir; ?>' + css[i]);
