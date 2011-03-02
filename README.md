@@ -1,6 +1,6 @@
 # wolf-codemirror
 
-Provides [CodeMirror](http://codemirror.net) syntax highlighter for [Wolf CMS](http://www.wolfcms.org) backend editor.
+Provides [CodeMirror2](http://codemirror.net/2/) syntax highlighter for [Wolf CMS](http://www.wolfcms.org) backend editor.
 
 ## Support parser:
 * HTML
@@ -14,16 +14,10 @@ Integrate with [File Manager](http://www.wolfcms.org/repository/8) plugin.
 
 ## Installation
 
-* Download from [here](http://devi.web.id/files/wolf-codemirror.zip) or [github](https://github.com/devi/wolf-codemirror).
-* Copy wolf-codemirror to <code>/path/to/wolf/plugins/</code>
-* Rename folder name from wolf-codemirror to codemirror
+* Download from [github](https://github.com/devi/wolf-codemirror) <code>branch codemirror2</code>.
+* Copy to <code>/path/to/wolf/plugins/</code>
+* Make sure the folder name <code>codemirror</code>
 * Go to administration page to enable or disable the plugin
-
-Cloning from github:
-	git clone git://github.com/devi/wolf-codemirror.git
-	cd wolf-codemirror
-	git submodule init
-	git submodule update
 	
 ## License
 
