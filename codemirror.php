@@ -92,6 +92,15 @@ function setSwitcher(target,id){
 	});
 }
 
+// backward
+function setTextAreaToolbar(el,filter){
+	resetCM(el);
+	if (filter === 'codemirror') {			
+		setCM(el);
+		setSwitcher($("#snippet_filter_id"),el);
+	}
+}
+
 $(function(){
 
 	var css = [
