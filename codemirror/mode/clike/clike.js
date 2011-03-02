@@ -1,17 +1,7 @@
 CodeMirror.defineMode("clike", function(config, parserConfig) {
-  var indentUnit = config.indentUnit, keywords = parserConfig.keywords, cpp = parserConfig.useCPP;
-
+  var indentUnit = config.indentUnit, keywords = parserConfig.keywords,
+      cpp = parserConfig.useCPP, multiLineStrings = parserConfig.multiLineStrings, $vars = parserConfig.$vars;
   var isOperatorChar = /[+\-*&%=<>!?|]/;
-
-  function nextUntilUnescaped(stream, end) {
-    var escaped = false, next;
-    while ((next = stream.next()) != null) {
-      if (next == end && !escaped)
-        return false;
-      escaped = !escaped && next == "\\";
-    }
-    return escaped;
-  }
 
   function chain(stream, state, f) {
     state.tokenize = f;
@@ -55,6 +45,10 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
       stream.eatWhile(isOperatorChar);
       return ret("operator");
     }
+    else if ($vars && ch == "$") {
+      stream.eatWhile(/[\w\$_]/);
+      return ret("word", "c-like-var");
+    }
     else {
       stream.eatWhile(/[\w\$_]/);
       if (keywords && keywords.propertyIsEnumerable(stream.current())) return ret("keyword", "c-like-keyword");
@@ -64,7 +58,12 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
 
   function tokenString(quote) {
     return function(stream, state) {
-      if (!nextUntilUnescaped(stream, quote))
+      var escaped = false, next, end = false;
+      while ((next = stream.next()) != null) {
+        if (next == quote && !escaped) {end = true; break;}
+        escaped = !escaped && next == "\\";
+      }
+      if (end || !(escaped || multiLineStrings))
         state.tokenize = tokenBase;
       return ret("string", "c-like-string");
     };
