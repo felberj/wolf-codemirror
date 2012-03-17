@@ -1,30 +1,59 @@
 <?php
 header('Content-Type: application/x-javascript');
-$pluginDir = dirname($_SERVER['PHP_SELF']).'/codemirror/';
 ?>
-
-function addCss(css){
-	var style = document.createElement('link');
-		style.rel = 'stylesheet';
-		style.type  = "text/css";
-		style.href   = css;
-	document.getElementsByTagName('head')[0].appendChild(style);
-};
 
 var cmEditor = {};
 
 function setCM(el, modeParser){
 	if (typeof cmEditor[el] !== 'undefined') return false; 
 
-	var cmMode = 'php';
+	var cmOption = {lineNumbers: true};
 
-	if (modeParser != null) { cmMode = modeParser; }
+	if (modeParser != null) {
+		switch (modeParser)
+		{
+			case "css":
+				cmOption = {mode: "css", lineNumbers: true};
+			break;
 
-	cmEditor[el] = CodeMirror.fromTextArea(
-		document.getElementById(el), {
-			mode: cmMode,
-			lineNumbers: true
-		});
+			case "javascript":
+				cmOption = {mode: "javascript", lineNumbers: true};
+			break;
+
+			case "xml":
+				cmOption = {mode: {name: "xml", alignCDATA: true}, lineNumbers: true};
+			break;
+
+			case "htmlmixed":
+				cmOption = {mode: "text/html", lineNumbers: true, tabMode: "indent"};
+			break;
+
+			case "php":
+				cmOption = {
+					lineNumbers: true,
+					matchBrackets: true,
+					mode: "application/x-httpd-php",
+					indentUnit: 4,
+					indentWithTabs: true,
+					enterMode: "keep",
+					tabMode: "shift"
+				};
+			break;
+
+			case "markdown":
+				cmOption = {mode: 'markdown', lineNumbers: true, matchBrackets: true};
+			break;
+		}
+	}
+
+	var uiOptions = {
+		path : <?php echo '"'.dirname($_SERVER["PHP_SELF"]).'/assets/js/",'; ?>
+		searchMode: false,
+		buttons : ['undo','redo','jump','reindent','about']
+	}
+
+	//cmEditor[el] = CodeMirror.fromTextArea(document.getElementById(el), cmOption);
+	cmEditor[el] = new CodeMirrorUI(document.getElementById(el),uiOptions,cmOption);
 };
 
 function resetCM(el,stay){
@@ -47,12 +76,12 @@ function setSwitcher(target,id){
 
 	var el = '<label for="'+cmSwitch+'" style="margin: 0 4px 0 50px;">Highlight</label>'+
 		'<select id="'+cmSwitch+'">'+
-		'<option value="null">&#8212; none &#8212;</option>'+
 		'<option value="javascript">Javascript</option>'+
 		'<option value="xml">XML/HTML</option>'+
 		'<option value="css">CSS</option>'+
 		'<option value="htmlmixed">Mixed-mode HTML</option>'+
 		'<option value="php" selected="selected">PHP</option>'+
+		'<option value="markdown">Markdown</option>'+
 		'</select>';
 
 	if (id === "file_content"){
@@ -63,60 +92,33 @@ function setSwitcher(target,id){
 	}
 
 	$("#"+cmSwitch).change(function(){
-		var cmParser = 'php';
-		switch ($(this).val())
-		{
-			case "css":
-				cmParser = 'css';
-			break;
-
-			case "javascript":
-				cmParser = 'javascript';
-			break;
-
-			case "xml":
-				cmParser = 'xml';
-			break;
-			
-			case "htmlmixed":
-				cmParser = 'htmlmixed';
-			break;
-			
-			case "null":
-				cmParser = 'null';
-			break;
-		}
-
 		resetCM(id,true);
-		setCM(id,cmParser);
+		setCM(id,$(this).val());
 	});
 }
 
 // backward
 function setTextAreaToolbar(el,filter){
 	resetCM(el);
-	if (filter === 'codemirror') {			
+	if (filter === 'codemirror') {
 		setCM(el);
 		setSwitcher($("#snippet_filter_id"),el);
 	}
-}
+};
+
+function addCss(css){
+	var style = document.createElement('link');
+		style.rel = 'stylesheet';
+		style.type  = "text/css";
+		style.href  = '<?php echo dirname($_SERVER["PHP_SELF"]); ?>/assets/css/'+css+'.css';
+	document.getElementsByTagName('head')[0].appendChild(style);
+};
 
 $(function(){
+	addCss("codemirror");
+	addCss("codemirror-ui");
 
-	var css = [
-		'lib/codemirror.css',
-		'mode/xml/xml.css',
-		'mode/javascript/javascript.css',
-		'mode/css/css.css',
-		'mode/clike/clike.css'
-	];
-
-	for ( var i = 0; i < css.length; i++ )
-		addCss('<?php echo $pluginDir; ?>' + css[i]);
-
-	addCss('<?php echo dirname($_SERVER['PHP_SELF']); ?>/codemirror2.css');
-
-	if ($("#layout_content").length > 0) setCM("layout_content");
+	if ($("#layout_content").length > 0) setCM("layout_content","php");
 
 	$('.filter-selector').live('wolfSwitchFilterOut', function(event, filtername, elem) {
 		if (filtername == 'codemirror') resetCM(elem.attr('id'));
@@ -124,7 +126,7 @@ $(function(){
 
 	$('.filter-selector').live('wolfSwitchFilterIn', function(event, filtername, elem) {
 		if (filtername == 'codemirror') {
-			setCM(elem.attr('id'));
+			setCM(elem.attr('id'), "php");
 			setSwitcher($(this), elem.attr('id'));
 		}
 	});

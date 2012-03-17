@@ -24,7 +24,9 @@ Integrate with [File Manager](http://www.wolfcms.org/repository/8) plugin.
 Major components:
 
 * Wolf CMS: GPLv3 license
-* CodeMirror: [Zlib-style](http://http://codemirror.net/LICENSE) license
+* CodeMirror: [MIT-style](http://http://codemirror.net/LICENSE) license
+* CodeMirror UI: [MIT] (https://github.com/jagthedrummer/codemirror-ui) license
+* Famfamfam silk icons: [CCA](http://famfamfam.com/lab/icons/silk/) license
 
 Everything else:
 

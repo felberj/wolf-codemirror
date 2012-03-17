@@ -1,3 +1,9 @@
+March 17, 2012
+	- update codemirror
+	- added dialog and search option
+	- added codemirror-ui
+	- need more testing
+
 March 2, 2011
 	- re-added backward compatibility for setTextAreaToolbar
 	- update README

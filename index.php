@@ -22,12 +22,12 @@ Plugin::setInfos(array(
 
 Filter::add('codemirror', 'codemirror/filter_codemirror.php');
 Plugin::addController('codemirror', 'codemirror', 'administrator,developer', false);
+
+// compression using https://github.com/mishoo/UglifyJS
+// codemirror.js, xml.js, javascript.js, css.js, htmlmixed.js,  clike.js, php,js, markdown.js
+Plugin::addJavascript('codemirror', 'assets/js/codemirror-bundled.js');
+
+Plugin::addJavascript('codemirror', 'assets/js/codemirror-ui.min.js');
+
 Plugin::addJavascript('codemirror','codemirror.php');
-Plugin::addJavascript('codemirror', 'codemirror/lib/codemirror.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/null/null.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/xml/xml.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/javascript/javascript.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/css/css.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/htmlmixed/htmlmixed.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/clike/clike.js');
-Plugin::addJavascript('codemirror', 'codemirror/mode/php/php.js');
+
