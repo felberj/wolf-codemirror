@@ -14,7 +14,7 @@ Integrate with [File Manager](http://www.wolfcms.org/repository/8) plugin.
 
 ## Installation
 
-* Download from [github](https://github.com/devi/wolf-codemirror) <code>branch codemirror2</code>.
+* Download from [github](https://github.com/devi/wolf-codemirror).
 * Copy to <code>/path/to/wolf/plugins/</code>
 * Make sure the folder name <code>codemirror</code>
 * Go to administration page to enable or disable the plugin
