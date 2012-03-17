@@ -17,7 +17,7 @@ Plugin::setInfos(array(
     'version'     => '1.0.3',
     'website'     => 'http://devi.web.id',
     'update_url'  => 'http://devi.web.id/wolf-plugin-versions.xml',
-    'require_wolf_version' => '0.7.3'
+    'require_wolf_version' => '0.7.5'
 ));
 
 Filter::add('codemirror', 'codemirror/filter_codemirror.php');

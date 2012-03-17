@@ -33,10 +33,7 @@ function setCM(el, modeParser){
 					lineNumbers: true,
 					matchBrackets: true,
 					mode: "application/x-httpd-php",
-					indentUnit: 4,
-					indentWithTabs: true,
-					enterMode: "keep",
-					tabMode: "shift"
+					indentWithTabs: true
 				};
 			break;
 

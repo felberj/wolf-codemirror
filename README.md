@@ -1,6 +1,6 @@
 # wolf-codemirror
 
-Provides [CodeMirror2](http://codemirror.net/2/) syntax highlighter for [Wolf CMS](http://www.wolfcms.org) backend editor.
+Provides [CodeMirror2](http://codemirror.net/) syntax highlighter for [Wolf CMS](http://www.wolfcms.org) backend editor.
 
 ## Support parser:
 * HTML
