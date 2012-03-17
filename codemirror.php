@@ -1,95 +1,60 @@
 <?php
 header('Content-Type: application/x-javascript');
-$pluginDir = dirname($_SERVER['PHP_SELF']).'/codemirror';
 ?>
 
-var cmDir = "<?php echo $pluginDir; ?>";
 var cmEditor = {};
 
-var CodeMirrorConfig = {	
-	lineNumbers: true,	
-	textWrapping: false,
-	path: cmDir + "/js/"
-};
+function setCM(el, modeParser){
+	if (typeof cmEditor[el] !== 'undefined') return false; 
 
-var dummyParser = {
-	parserfile: ["parsedummy.js"]
-	//stylesheet: [cmDir + "/css/dummy.css"]
-};	
+	var cmOption = {lineNumbers: true};
 
-var htmlxmlParser = {
-	parserfile: ["parsexml.js"],
-	stylesheet: [cmDir + "/css/xmlcolors.css"]
-};
-
-var cssParser = {
-	parserfile: ["parsecss.js"],
-	stylesheet: [cmDir + "/css/csscolors.css"]
-};	
-	
-var jsParser = {
-	parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-	stylesheet: [cmDir + "/css/jscolors.css"]
-};	
-
-var htmlmixedParser = {
-	parserfile: ["parsehtmlmixed.js"]
-};
-	
-var htmlphpmixedParser = {
-	parserfile: [
-		"../contrib/php/js/tokenizephp.js",
-		"../contrib/php/js/parsephp.js",
-		"../contrib/php/js/parsephphtmlmixed.js"
-	],
-	stylesheet: [cmDir + "/contrib/php/css/phpcolors.css"]
-};
-	
-function _mixandbake() {
-	var target = {parserfile:[],stylesheet:[]}, options, context;
-	
-	for ( var i = 0; i < arguments.length; i++ )
-	{
-		if ( (options = arguments[i]) != null )
+	if (modeParser != null) {
+		switch (modeParser)
 		{
-			for ( var name in options )
-			{
-				context = options[name];
-					
-				if (Object.prototype.toString.call(context) === "[object Array]")
-				{						
-					for (var val in context)
-					{						
-						target[name].push(context[val]);
-					}
-				}
-				else
-				{
-					target[name] = context;
-				}
-			}
+			case "css":
+				cmOption = {mode: "css", lineNumbers: true};
+			break;
+
+			case "javascript":
+				cmOption = {mode: "javascript", lineNumbers: true};
+			break;
+
+			case "xml":
+				cmOption = {mode: {name: "xml", alignCDATA: true}, lineNumbers: true};
+			break;
+
+			case "htmlmixed":
+				cmOption = {mode: "text/html", lineNumbers: true, tabMode: "indent"};
+			break;
+
+			case "php":
+				cmOption = {
+					lineNumbers: true,
+					matchBrackets: true,
+					mode: "application/x-httpd-php",
+					indentWithTabs: true
+				};
+			break;
+
+			case "markdown":
+				cmOption = {mode: 'markdown', lineNumbers: true, matchBrackets: true};
+			break;
 		}
 	}
-		
-	return target;
-}
 
-var defaultCfg = _mixandbake(dummyParser, htmlxmlParser, cssParser, jsParser, htmlmixedParser, htmlphpmixedParser);
+	var uiOptions = {
+		path : <?php echo '"'.dirname($_SERVER["PHP_SELF"]).'/assets/js/",'; ?>
+		searchMode: false,
+		buttons : ['undo','redo','jump','reindent','about']
+	}
 
-// @todo check codemirror instance not getting bound twice
-function setCM(el,modeParser){
-	if (typeof cmEditor[el] !== 'undefined') return false; 
-	
-	var cmMode = defaultCfg;
-		
-	if (modeParser != null) { cmMode = modeParser; }
-	
-	cmEditor[el] = CodeMirror.fromTextArea(el, _mixandbake(cmMode, {content:$("#"+el).val()}));
-}
+	//cmEditor[el] = CodeMirror.fromTextArea(document.getElementById(el), cmOption);
+	cmEditor[el] = new CodeMirrorUI(document.getElementById(el),uiOptions,cmOption);
+};
 
 function resetCM(el,stay){
-	if (typeof cmEditor[el] !== 'undefined'){		
-		$("#"+el).html(cmEditor[el].getCode());
+	if (typeof cmEditor[el] !== 'undefined'){
 		cmEditor[el].toTextArea();
 		delete cmEditor[el];
 		
@@ -98,92 +63,81 @@ function resetCM(el,stay){
 		var cmSwitch = "codemirror-" + el;
 		$("label[for="+cmSwitch+"]").remove();
 		$("#"+cmSwitch).remove();
-
 	}
-}
+};
 
-function setSwitcher(target,id){	
+function setSwitcher(target,id){
 	var cmSwitch = 'codemirror-' + id;
-	
+
 	if ($("#"+cmSwitch).length > 0) return false;
-	
+
 	var el = '<label for="'+cmSwitch+'" style="margin: 0 4px 0 50px;">Highlight</label>'+
 		'<select id="'+cmSwitch+'">'+
-		'<option value="dummyParser">&#8212; none &#8212;</option>'+				
-		'<option value="cssParser">CSS</option>'+
-		'<option value="jsParser">Javascript</option>'+				
-		'<option value="htmlmixedParser">HTML mixed-mode</option>'+
-		'<option value="htmlphpmixedParser" selected="selected">HTML+PHP mixed-mode</option>'+				
+		'<option value="javascript">Javascript</option>'+
+		'<option value="xml">XML/HTML</option>'+
+		'<option value="css">CSS</option>'+
+		'<option value="htmlmixed">Mixed-mode HTML</option>'+
+		'<option value="php" selected="selected">PHP</option>'+
+		'<option value="markdown">Markdown</option>'+
 		'</select>';
-	
+
 	if (id === "file_content"){
 		target.parent().prepend(el);
-		$("label[for="+cmSwitch+"]").css({"margin-left":0});		
+		$("label[for="+cmSwitch+"]").css({"margin-left":0});
 	} else {
 		target.parent().append(el);
 	}
-		
+
 	$("#"+cmSwitch).change(function(){
-		var cmParser = defaultCfg;
-		switch ($(this).val())
-		{
-			case "dummyParser":				
-				cmParser = dummyParser;
-			break;
-			
-			case "cssParser":
-				cmParser = cssParser;
-			break;
-			
-			case "jsParser":
-				cmParser = jsParser;
-			break;
-			
-			case "htmlmixedParser":
-				cmParser = _mixandbake(htmlxmlParser,cssParser,jsParser,htmlmixedParser);
-			break;
-		}
-		
 		resetCM(id,true);
-		setCM(id,cmParser);
+		setCM(id,$(this).val());
 	});
 }
 
 // backward
 function setTextAreaToolbar(el,filter){
 	resetCM(el);
-	if (filter === 'codemirror') {			
+	if (filter === 'codemirror') {
 		setCM(el);
 		setSwitcher($("#snippet_filter_id"),el);
 	}
-}
+};
+
+function addCss(css){
+	var style = document.createElement('link');
+		style.rel = 'stylesheet';
+		style.type  = "text/css";
+		style.href  = '<?php echo dirname($_SERVER["PHP_SELF"]); ?>/assets/css/'+css+'.css';
+	document.getElementsByTagName('head')[0].appendChild(style);
+};
 
 $(function(){
-	if ($("#layout_content").length > 0) setCM("layout_content");	
+	addCss("codemirror");
+	addCss("codemirror-ui");
 
-    $('.filter-selector').live('wolfSwitchFilterOut', function(event, filtername, elem) {
-        if (filtername == 'codemirror') {			
-			resetCM(elem.attr('id'));
+	if ($("#layout_content").length > 0) setCM("layout_content","php");
+
+	$('.filter-selector').live('wolfSwitchFilterOut', function(event, filtername, elem) {
+		if (filtername == 'codemirror') resetCM(elem.attr('id'));
+	});
+
+	$('.filter-selector').live('wolfSwitchFilterIn', function(event, filtername, elem) {
+		if (filtername == 'codemirror') {
+			setCM(elem.attr('id'), "php");
+			setSwitcher($(this), elem.attr('id'));
 		}
-    });
-    
-    $('.filter-selector').live('wolfSwitchFilterIn', function(event, filtername, elem) {
-        if (filtername == 'codemirror') {
-			var el = elem.attr('id');			
-			setCM(el);
-			setSwitcher($(this), el);
-        }
-    });    
-    
-    if ($("#file_content").length > 0){
+	});
+
+	if ($("#file_content").length > 0){
 		var cm_url = $("#file_manager-plugin a").attr("href");
 		var cm_idx = cm_url.indexOf("file_manager");
 		var cm_url = cm_url.substr(0, cm_idx) + "codemirror/cm_integrate";
 		$.get(cm_url, function(data){
-			if (data === "1") {			
+			if (data === "1") {
 				setCM("file_content");
-				setSwitcher($("#file_content"),'file_content'); 
+				setSwitcher($("#file_content"),'file_content');
 			}
 		});
 	}
+
 });
